@@ -60,7 +60,7 @@ const (
 
 type ILog interface {
 	log(level Level, subject string, messages []string)
-	print(level Level, msg string)
+	print(level Level, msg *Messgae)
 }
 
 type Log struct {
@@ -74,7 +74,9 @@ type Log struct {
 }
 
 type Messgae struct {
-	msg string
+	msg      string
+	subject  string
+	printMsg string
 	Level
 }
 
@@ -197,7 +199,7 @@ func Mail(subject string, msg ...string) {
 		return
 	}
 
-	_conf.Error.log(MAIL, subject, msg)
+	_conf.Mail.log(MAIL, subject, msg)
 }
 
 func Mailf(suject string, format string, a ...interface{}) {
@@ -305,17 +307,17 @@ func OutputMsg() {
 		case msg = <-msgChan:
 			switch msg.Level {
 			case DEBUG:
-				_conf.Debug.print(msg.Level, msg.msg)
+				_conf.Debug.print(msg.Level, msg)
 			case INFO:
-				_conf.Info.print(msg.Level, msg.msg)
+				_conf.Info.print(msg.Level, msg)
 			case WARN:
-				_conf.Warn.print(msg.Level, msg.msg)
+				_conf.Warn.print(msg.Level, msg)
 			case FAIL:
-				_conf.Fail.print(msg.Level, msg.msg)
+				_conf.Fail.print(msg.Level, msg)
 			case ERROR:
-				_conf.Error.print(msg.Level, msg.msg)
+				_conf.Error.print(msg.Level, msg)
 			case MAIL:
-				_conf.Error.print(msg.Level, msg.msg)
+				_conf.Mail.print(msg.Level, msg)
 			}
 		}
 	}

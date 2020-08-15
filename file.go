@@ -28,21 +28,19 @@ func (f *File) log(level Level, subject string, messages []string) {
 	}
 	arr := strings.Split(file, "/")
 	var msg string
+	var printMsg string
 	for i, item := range messages {
 		if i > 0 {
 			msg += " "
 		}
 		msg += item
 	}
-	if subject != "" {
-		msg = subject + splitStr + msg
-	}
 	fLn := fmt.Sprintf("%s:%d:", arr[len(arr)-1], line)
-	msg = fmt.Sprintf("%-25s %s", fLn, msg)
-	msgChan <- &Messgae{strings.TrimRight(msg, "\n"), level}
+	printMsg = fmt.Sprintf("%-25s %s", fLn, msg)
+	msgChan <- &Messgae{msg, subject, strings.TrimRight(printMsg, "\n"), level}
 }
 
-func (f *File) print(level Level, msg string) {
+func (f *File) print(level Level, msg *Messgae) {
 	var curTime = time.Now()
 	if curTime.Day() != f.Day || !isExistLogFile(f.Level, curTime) {
 		file, err := openLogFile(f.Level, curTime)
@@ -56,11 +54,14 @@ func (f *File) print(level Level, msg string) {
 
 	switch level {
 	case MAIL:
-		strs := strings.Split(msg, splitStr)
-		f.Println(msg)
-		email.SendEmail(strs[0], strs[1])
+		f.Println(msg.printMsg)
+
+		err := email.SendEmail(msg.subject, msg.msg)
+		if err != nil {
+			Errorf("send email failed! error:%s, subject:%s, msg:%s", err, msg.subject, msg.msg)
+		}
 	default:
-		f.Println(msg)
+		f.Println(msg.printMsg)
 	}
 }
 
