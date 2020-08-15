@@ -1,4 +1,4 @@
-package log
+package email
 
 import (
 	"github.com/go-gomail/gomail"
@@ -22,7 +22,7 @@ func NewEmail(opt *EMailOption) *EMail {
 }
 
 func (e *EMail) SendEmail(subject string, body string) error {
-	m := gomail.NewMessage()
+	/*m := gomail.NewMessage()
 
 	port, err := strconv.Atoi(e.opt.Port)
 	if err != nil {
@@ -38,5 +38,6 @@ func (e *EMail) SendEmail(subject string, body string) error {
 
 	d := gomail.NewDialer(e.opt.Host, port, e.opt.User, e.opt.Pass)
 
-	return d.DialAndSend(m)
+	return d.DialAndSend(m)*/
+	e := email.NewEmail()
 }
