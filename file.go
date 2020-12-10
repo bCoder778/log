@@ -65,7 +65,7 @@ func (f *File) print(level Level, msg *Messgae) {
 	}
 }
 
-func openLogFileopenLogFile(level Level, curTime time.Time) (*os.File, error) {
+func openLogFile(level Level, curTime time.Time) (*os.File, error) {
 	logDir := fmt.Sprintf(path+"/%04d%02d%02d", curTime.Year(), curTime.Month(), curTime.Day())
 	if !Exist(path) {
 		err := os.Mkdir(path, os.ModePerm)
