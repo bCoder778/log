@@ -65,10 +65,10 @@ func (f *File) print(level Level, msg *Messgae) {
 	}
 }
 
-func openLogFile(level Level, curTime time.Time) (*os.File, error) {
-	logDir := fmt.Sprintf("logs/%04d%02d%02d", curTime.Year(), curTime.Month(), curTime.Day())
-	if !Exist("logs") {
-		err := os.Mkdir("logs", os.ModePerm)
+func openLogFileopenLogFile(level Level, curTime time.Time) (*os.File, error) {
+	logDir := fmt.Sprintf(path+"/%04d%02d%02d", curTime.Year(), curTime.Month(), curTime.Day())
+	if !Exist(path) {
+		err := os.Mkdir(path, os.ModePerm)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func openLogFile(level Level, curTime time.Time) (*os.File, error) {
 }
 
 func isExistLogFile(level Level, curTime time.Time) bool {
-	fileName := fmt.Sprintf("logs/%04d%02d%02d/%s.log", curTime.Year(), curTime.Month(), curTime.Day(), level.ToString(""))
+	fileName := fmt.Sprintf(path+"/%04d%02d%02d/%s.log", curTime.Year(), curTime.Month(), curTime.Day(), level.ToString(""))
 	return Exist(fileName)
 }
 

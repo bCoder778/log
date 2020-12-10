@@ -89,6 +89,7 @@ var emailOpt = &EMailOption{}
 var (
 	logLevel = DEBUG
 	mode     = Mode_Console
+	path     = "logs"
 )
 
 func init() {
@@ -131,6 +132,7 @@ func start() {
 type Option struct {
 	LogLevel Level
 	Mode     Mode
+	Path     string
 	Email    *EMailOption
 }
 
@@ -139,6 +141,7 @@ func SetOption(opt *Option) {
 	logLevel = opt.LogLevel
 	mode = opt.Mode
 	emailOpt = opt.Email
+	path = opt.Path
 	start()
 }
 
@@ -337,14 +340,14 @@ func createLevelLogger(level Level, t time.Time) *log.Logger {
 }
 
 func dealFatal() {
-	if !Exist("logs") {
-		err := os.Mkdir("logs", 0666)
+	if !Exist(path) {
+		err := os.Mkdir(path, 0666)
 		if err != nil {
 			fmt.Println("deal fatal failed! ", err)
 			os.Exit(1)
 		}
 	}
-	logFile, err := os.OpenFile("./logs/fatal.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	logFile, err := os.OpenFile(path+"/fatal.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("deal fatal failed! ", err)
 		os.Exit(1)
