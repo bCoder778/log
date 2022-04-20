@@ -54,8 +54,9 @@ const (
 )
 
 const (
-	Mode_File    Mode = 11
-	Mode_Console Mode = 12
+	Mode_File        Mode = 11
+	Mode_Console     Mode = 12
+	Mode_FileConsole Mode = 13
 )
 
 type ILog interface {
@@ -81,7 +82,8 @@ type Messgae struct {
 }
 
 var msgChan chan *Messgae
-var _conf Log
+var _conf *Log
+var _conf2 *Log
 var stop chan bool
 var email *EMail
 var emailOpt = &EMailOption{}
@@ -104,7 +106,7 @@ func start() {
 	switch mode {
 	case Mode_File:
 		var curTime = time.Now()
-		_conf = Log{
+		_conf = &Log{
 			Level: level,
 			Debug: &File{curTime.Day(), *createLevelLogger(DEBUG, curTime), DEBUG},
 			Info:  &File{curTime.Day(), *createLevelLogger(INFO, curTime), INFO},
@@ -114,9 +116,33 @@ func start() {
 			Mail:  &File{curTime.Day(), *createLevelLogger(MAIL, curTime), MAIL},
 		}
 		dealFatal()
+	case Mode_FileConsole:
+		var curTime = time.Now()
+		_conf = &Log{
+			Level: level,
+			Debug: &File{curTime.Day(), *createLevelLogger(DEBUG, curTime), DEBUG},
+			Info:  &File{curTime.Day(), *createLevelLogger(INFO, curTime), INFO},
+			Warn:  &File{curTime.Day(), *createLevelLogger(WARN, curTime), WARN},
+			Fail:  &File{curTime.Day(), *createLevelLogger(FAIL, curTime), FAIL},
+			Error: &File{curTime.Day(), *createLevelLogger(ERROR, curTime), ERROR},
+			Mail:  &File{curTime.Day(), *createLevelLogger(MAIL, curTime), MAIL},
+		}
+		dealFatal()
+
+		cliLogger := log.New(os.Stdout, "", log.Ltime)
+		_conf2 = &Log{
+			Level: level,
+			Debug: &Console{StyleFlash, *cliLogger},
+			Info:  &Console{StyleFlash, *cliLogger},
+			Warn:  &Console{StyleFlash, *cliLogger},
+			Fail:  &Console{StyleFlash, *cliLogger},
+			Error: &Console{StyleFlash, *cliLogger},
+			Mail:  &Console{StyleFlash, *cliLogger},
+		}
+
 	default:
 		cliLogger := log.New(os.Stdout, "", log.Ltime)
-		_conf = Log{
+		_conf = &Log{
 			Level: level,
 			Debug: &Console{StyleFlash, *cliLogger},
 			Info:  &Console{StyleFlash, *cliLogger},
@@ -150,6 +176,9 @@ func Debug(msg ...string) {
 		return
 	}
 	_conf.Debug.log(DEBUG, "", msg)
+	if _conf2 != nil {
+		_conf2.Debug.log(DEBUG, "", msg)
+	}
 }
 
 func Debugf(format string, a ...interface{}) {
@@ -161,6 +190,9 @@ func Info(msg ...string) {
 		return
 	}
 	_conf.Info.log(INFO, "", msg)
+	if _conf2 != nil {
+		_conf2.Info.log(INFO, "", msg)
+	}
 }
 func Infof(format string, a ...interface{}) {
 	Info(fmt.Sprintf(format, a...))
@@ -171,6 +203,9 @@ func Warn(msg ...string) {
 		return
 	}
 	_conf.Warn.log(WARN, "", msg)
+	if _conf2 != nil {
+		_conf2.Warn.log(WARN, "", msg)
+	}
 }
 func Warnf(format string, a ...interface{}) {
 	Warn(fmt.Sprintf(format, a...))
@@ -181,6 +216,9 @@ func Fail(msg ...string) {
 		return
 	}
 	_conf.Fail.log(FAIL, "", msg)
+	if _conf2 != nil {
+		_conf2.Fail.log(FAIL, "", msg)
+	}
 }
 func Failf(format string, a ...interface{}) {
 	Fail(fmt.Sprintf(format, a...))
@@ -191,6 +229,9 @@ func Error(msg ...string) {
 		return
 	}
 	_conf.Error.log(ERROR, "", msg)
+	if _conf2 != nil {
+		_conf2.Error.log(ERROR, "", msg)
+	}
 }
 
 func Errorf(format string, a ...interface{}) {
@@ -203,6 +244,9 @@ func Mail(subject string, msg ...string) {
 	}
 
 	_conf.Mail.log(MAIL, subject, msg)
+	if _conf2 != nil {
+		_conf2.Mail.log(MAIL, "", msg)
+	}
 }
 
 func Mailf(suject string, format string, a ...interface{}) {
@@ -311,16 +355,34 @@ func OutputMsg() {
 			switch msg.Level {
 			case DEBUG:
 				_conf.Debug.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Debug.print(msg.Level, msg)
+				}
 			case INFO:
 				_conf.Info.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Info.print(msg.Level, msg)
+				}
 			case WARN:
 				_conf.Warn.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Warn.print(msg.Level, msg)
+				}
 			case FAIL:
 				_conf.Fail.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Fail.print(msg.Level, msg)
+				}
 			case ERROR:
 				_conf.Error.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Error.print(msg.Level, msg)
+				}
 			case MAIL:
 				_conf.Mail.print(msg.Level, msg)
+				if _conf2 != nil {
+					_conf2.Mail.print(msg.Level, msg)
+				}
 			}
 		}
 	}
