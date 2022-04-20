@@ -116,6 +116,7 @@ func start() {
 			Mail:  &File{curTime.Day(), *createLevelLogger(MAIL, curTime), MAIL},
 		}
 		dealFatal()
+		_conf2 = nil
 	case Mode_FileConsole:
 		var curTime = time.Now()
 		_conf = &Log{
@@ -151,6 +152,7 @@ func start() {
 			Error: &Console{StyleFlash, *cliLogger},
 			Mail:  &Console{StyleFlash, *cliLogger},
 		}
+		_conf2 = nil
 	}
 	go OutputMsg()
 }
