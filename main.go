@@ -179,10 +179,10 @@ func Debug(msg ...string) {
 		return
 	}
 	if _conf != nil {
-		_conf.Debug.log(INFO, "", msg)
+		_conf.Debug.log(DEBUG, "", msg)
 	}
 	if _conf2 != nil {
-		_conf2.Debug.log(INFO, "", msg)
+		_conf2.Debug.log(DEBUG, "", msg)
 	}
 }
 
@@ -210,10 +210,10 @@ func Warn(msg ...string) {
 		return
 	}
 	if _conf != nil {
-		_conf.Warn.log(INFO, "", msg)
+		_conf.Warn.log(WARN, "", msg)
 	}
 	if _conf2 != nil {
-		_conf2.Warn.log(INFO, "", msg)
+		_conf2.Warn.log(WARN, "", msg)
 	}
 }
 func Warnf(format string, a ...interface{}) {
@@ -225,10 +225,10 @@ func Fail(msg ...string) {
 		return
 	}
 	if _conf != nil {
-		_conf.Fail.log(INFO, "", msg)
+		_conf.Fail.log(FAIL, "", msg)
 	}
 	if _conf2 != nil {
-		_conf2.Fail.log(INFO, "", msg)
+		_conf2.Fail.log(FAIL, "", msg)
 	}
 }
 func Failf(format string, a ...interface{}) {
@@ -240,10 +240,10 @@ func Error(msg ...string) {
 		return
 	}
 	if _conf != nil {
-		_conf.Error.log(INFO, "", msg)
+		_conf.Error.log(ERROR, "", msg)
 	}
 	if _conf2 != nil {
-		_conf2.Error.log(INFO, "", msg)
+		_conf2.Error.log(ERROR, "", msg)
 	}
 }
 
@@ -257,10 +257,10 @@ func Mail(subject string, msg ...string) {
 	}
 
 	if _conf != nil {
-		_conf.Mail.log(INFO, "", msg)
+		_conf.Mail.log(MAIL, "", msg)
 	}
 	if _conf2 != nil {
-		_conf2.Mail.log(INFO, "", msg)
+		_conf2.Mail.log(MAIL, "", msg)
 	}
 }
 
