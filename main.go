@@ -362,12 +362,11 @@ func TranslateToLevel(l string) Level {
 
 func OutputMsg() {
 	var msg *Messgae
-	var msgFile *Messgae
 	for {
 		select {
 		case <-stop:
 			return
-		case msgFile = <-msgChan:
+		case msg = <-msgChan:
 			switch msg.Level {
 			case DEBUG:
 				_conf2.Debug.print(msg.Level, msg)
