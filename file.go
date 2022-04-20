@@ -37,7 +37,7 @@ func (f *File) log(level Level, subject string, messages []string) {
 	}
 	fLn := fmt.Sprintf("%s:%d:", arr[len(arr)-1], line)
 	printMsg = fmt.Sprintf("%-25s %s", fLn, msg)
-	msgChan <- &Messgae{msg, subject, strings.TrimRight(printMsg, "\n"), level}
+	msgChanFile <- &Messgae{msg, subject, strings.TrimRight(printMsg, "\n"), level}
 }
 
 func (f *File) print(level Level, msg *Messgae) {

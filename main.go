@@ -82,6 +82,7 @@ type Messgae struct {
 }
 
 var msgChan chan *Messgae
+var msgChanFile chan *Messgae
 var _conf *Log
 var _conf2 *Log
 var stop chan bool
@@ -97,6 +98,7 @@ var (
 func init() {
 	stop = make(chan bool)
 	msgChan = make(chan *Messgae, 1000)
+	msgChanFile = make(chan *Messgae, 1000)
 	start()
 }
 
@@ -143,7 +145,7 @@ func start() {
 
 	default:
 		cliLogger := log.New(os.Stdout, "", log.Ltime)
-		_conf = &Log{
+		_conf2 = &Log{
 			Level: level,
 			Debug: &Console{StyleFlash, *cliLogger},
 			Info:  &Console{StyleFlash, *cliLogger},
@@ -152,7 +154,6 @@ func start() {
 			Error: &Console{StyleFlash, *cliLogger},
 			Mail:  &Console{StyleFlash, *cliLogger},
 		}
-		_conf2 = nil
 	}
 	go OutputMsg()
 }
@@ -177,9 +178,11 @@ func Debug(msg ...string) {
 	if _conf.Level > DEBUG {
 		return
 	}
-	_conf.Debug.log(DEBUG, "", msg)
+	if _conf != nil {
+		_conf.Debug.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
-		_conf2.Debug.log(DEBUG, "", msg)
+		_conf2.Debug.log(INFO, "", msg)
 	}
 }
 
@@ -191,7 +194,9 @@ func Info(msg ...string) {
 	if _conf.Level > INFO {
 		return
 	}
-	_conf.Info.log(INFO, "", msg)
+	if _conf != nil {
+		_conf.Info.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
 		_conf2.Info.log(INFO, "", msg)
 	}
@@ -204,9 +209,11 @@ func Warn(msg ...string) {
 	if _conf.Level > WARN {
 		return
 	}
-	_conf.Warn.log(WARN, "", msg)
+	if _conf != nil {
+		_conf.Warn.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
-		_conf2.Warn.log(WARN, "", msg)
+		_conf2.Warn.log(INFO, "", msg)
 	}
 }
 func Warnf(format string, a ...interface{}) {
@@ -217,9 +224,11 @@ func Fail(msg ...string) {
 	if _conf.Level > FAIL {
 		return
 	}
-	_conf.Fail.log(FAIL, "", msg)
+	if _conf != nil {
+		_conf.Fail.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
-		_conf2.Fail.log(FAIL, "", msg)
+		_conf2.Fail.log(INFO, "", msg)
 	}
 }
 func Failf(format string, a ...interface{}) {
@@ -230,9 +239,11 @@ func Error(msg ...string) {
 	if _conf.Level > ERROR {
 		return
 	}
-	_conf.Error.log(ERROR, "", msg)
+	if _conf != nil {
+		_conf.Error.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
-		_conf2.Error.log(ERROR, "", msg)
+		_conf2.Error.log(INFO, "", msg)
 	}
 }
 
@@ -245,9 +256,11 @@ func Mail(subject string, msg ...string) {
 		return
 	}
 
-	_conf.Mail.log(MAIL, subject, msg)
+	if _conf != nil {
+		_conf.Mail.log(INFO, "", msg)
+	}
 	if _conf2 != nil {
-		_conf2.Mail.log(MAIL, "", msg)
+		_conf2.Mail.log(INFO, "", msg)
 	}
 }
 
@@ -349,42 +362,40 @@ func TranslateToLevel(l string) Level {
 
 func OutputMsg() {
 	var msg *Messgae
+	var msgFile *Messgae
 	for {
 		select {
 		case <-stop:
 			return
-		case msg = <-msgChan:
+		case msgFile = <-msgChan:
+			switch msg.Level {
+			case DEBUG:
+				_conf2.Debug.print(msg.Level, msg)
+			case INFO:
+				_conf2.Info.print(msg.Level, msg)
+			case WARN:
+				_conf2.Warn.print(msg.Level, msg)
+			case FAIL:
+				_conf2.Fail.print(msg.Level, msg)
+			case ERROR:
+				_conf2.Error.print(msg.Level, msg)
+			case MAIL:
+				_conf2.Mail.print(msg.Level, msg)
+			}
+		case msg = <-msgChanFile:
 			switch msg.Level {
 			case DEBUG:
 				_conf.Debug.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Debug.print(msg.Level, msg)
-				}
 			case INFO:
 				_conf.Info.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Info.print(msg.Level, msg)
-				}
 			case WARN:
 				_conf.Warn.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Warn.print(msg.Level, msg)
-				}
 			case FAIL:
 				_conf.Fail.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Fail.print(msg.Level, msg)
-				}
 			case ERROR:
 				_conf.Error.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Error.print(msg.Level, msg)
-				}
 			case MAIL:
 				_conf.Mail.print(msg.Level, msg)
-				if _conf2 != nil {
-					_conf2.Mail.print(msg.Level, msg)
-				}
 			}
 		}
 	}
