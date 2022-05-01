@@ -209,10 +209,11 @@ func Warn(msg ...string) {
 	if _conf.Level > WARN {
 		return
 	}
-	if _conf != nil {
+	if _conf != nil && _conf2 != nil {
 		_conf.Warn.log(WARN, "", msg)
-	}
-	if _conf2 != nil {
+	} else if _conf != nil {
+		_conf.Warn.log(WARN, "", msg)
+	} else if _conf2 != nil {
 		_conf2.Warn.log(WARN, "", msg)
 	}
 }
