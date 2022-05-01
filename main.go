@@ -257,10 +257,10 @@ func Mail(subject string, msg ...string) {
 	}
 
 	if _conf != nil {
-		_conf.Mail.log(MAIL, "", msg)
+		_conf.Mail.log(MAIL, subject, msg)
 	}
 	if _conf2 != nil {
-		_conf2.Mail.log(MAIL, "", msg)
+		_conf2.Mail.log(MAIL, subject, msg)
 	}
 }
 
