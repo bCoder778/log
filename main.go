@@ -145,7 +145,7 @@ func start() {
 
 	default:
 		cliLogger := log.New(os.Stdout, "", log.Ltime)
-		_conf2 = &Log{
+		_conf = &Log{
 			Level: level,
 			Debug: &Console{StyleFlash, *cliLogger},
 			Info:  &Console{StyleFlash, *cliLogger},
