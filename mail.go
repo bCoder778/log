@@ -10,6 +10,7 @@ type EMail struct {
 }
 
 type EMailOption struct {
+	Title  string
 	User   string
 	Name   string
 	Pass   string
@@ -24,7 +25,9 @@ func NewEmail(opt *EMailOption) *EMail {
 
 func (e *EMail) SendEmail(subject string, body string) error {
 	m := gomail.NewMessage()
-
+	if subject == "" {
+		subject = e.opt.Title
+	}
 	port, err := strconv.Atoi(e.opt.Port)
 	if err != nil {
 		return err
