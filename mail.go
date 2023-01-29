@@ -29,6 +29,7 @@ func NewEmail(opt *EMailOption) *EMail {
 	}
 	e := &EMail{opt: opt}
 	if e.opt.DuplicateRemoval {
+		e.msg = make(map[string]int64)
 		go e.expired()
 	}
 	return e
