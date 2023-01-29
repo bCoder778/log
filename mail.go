@@ -3,27 +3,62 @@ package log
 import (
 	"github.com/go-gomail/gomail"
 	"strconv"
+	"time"
 )
 
 type EMail struct {
 	opt *EMailOption
+	msg map[string]int64
 }
 
 type EMailOption struct {
-	Title  string
-	User   string
-	Name   string
-	Pass   string
-	Host   string
-	Port   string
-	Target []string
+	Title             string
+	User              string
+	Name              string
+	Pass              string
+	Host              string
+	Port              string
+	Target            []string
+	DuplicateRemoval  bool
+	DuplicateInterval int64
 }
 
 func NewEmail(opt *EMailOption) *EMail {
-	return &EMail{opt: opt}
+	if opt.DuplicateInterval == 0 {
+		opt.DuplicateInterval = 60 * 60
+	}
+	e := &EMail{opt: opt}
+	if e.opt.DuplicateRemoval {
+		go e.expired()
+	}
+	return e
+}
+
+func (e *EMail) expired() {
+	t := time.NewTicker(time.Second * time.Duration(e.opt.DuplicateInterval))
+	for {
+		select {
+		case <-t.C:
+			now := time.Now()
+			for key, time := range e.msg {
+				if now.Unix()-time > e.opt.DuplicateInterval {
+					delete(e.msg, key)
+				}
+			}
+		}
+	}
 }
 
 func (e *EMail) SendEmail(subject string, body string) error {
+	if e.opt.DuplicateRemoval {
+		key := subject + body
+		_, exist := e.msg[key]
+		if exist {
+			return nil
+		} else {
+			e.msg[key] = time.Now().Unix()
+		}
+	}
 	m := gomail.NewMessage()
 	if subject == "" {
 		subject = e.opt.Title
