@@ -426,5 +426,5 @@ func dealFatal() {
 		fmt.Println("deal fatal failed! ", err)
 		os.Exit(1)
 	}
-	syscall.Dup2(int(logFile.Fd()), int(os.Stderr.Fd()))
+	syscall.Dup3(int(logFile.Fd()), int(os.Stderr.Fd()), 0)
 }
