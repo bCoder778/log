@@ -1,5 +1,11 @@
 package log
 
+import (
+	"fmt"
+	"os"
+	"syscall"
+)
+
 func dealFatal() {
 	if !Exist(path) {
 		err := os.Mkdir(path, 0666)
